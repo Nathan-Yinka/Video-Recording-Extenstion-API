@@ -31,7 +31,7 @@
                  
                 console.log("Read successfully");
                 const fileName = Math.random() * 1000 + theFile.name;
-                for (let chunkId = 0; chunkId < chunkCount + 1; chunkId ++ )
+                for (let chunkId = 0; chunkId < chunkCount + 2; chunkId ++ )
                 {
                     const chunk = ev.target.result.slice(chunkId * CHUNK_SIZE, chunkId * CHUNK_SIZE + CHUNK_SIZE );
                     console.log(chunk)
@@ -41,7 +41,7 @@
 
             try {
                 // Send the chunk to the server using a fetch request
-                const response = await fetch("http://127.0.0.1:8000/videos/chunks/3", {
+                const response = await fetch("http://127.0.0.1:8000/videos/chunks/1", {
                     method: "POST",
                     body: formData,
                 });

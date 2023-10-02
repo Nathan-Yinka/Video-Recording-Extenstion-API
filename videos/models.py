@@ -12,6 +12,7 @@ class Video(models.Model):
     transcript = models.TextField(null=True,blank=True)
     transcript_path =  models.URLField(blank=True,null=True)
     transcript_data = models.BinaryField(blank=True,null= True)
+    audio_path = models.CharField(max_length=250,blank=True, null=True)
     
     
 

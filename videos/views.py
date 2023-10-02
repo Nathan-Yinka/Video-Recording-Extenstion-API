@@ -45,6 +45,41 @@ from io import BytesIO
 # gettig the transipt
 import openai
 
+def transcribe_audio(audio_file_path, chunk_size=20000000):
+    try:
+        # Set your OpenAI API key
+        api_key = "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"
+
+        # Initialize the OpenAI API client
+        openai.api_key = api_key
+
+        # Initialize an empty transcript
+        transcript = ""
+
+        # Open the audio file in binary read mode
+        with open(audio_file_path, "rb") as audio_file:
+                # Read a 5MB chunk of the audio file
+                chunk = audio_file.read(chunk_size)
+                
+                # If the chunk is empty, we've reached the end of the file
+                if not chunk:
+                    return ""
+
+                # Wrap the chunk in a BytesIO object with a name attribute
+                chunk_file = BytesIO(chunk)
+                chunk_file.name = "audio_chunk.wav"
+
+                # Call the Whisper ASR API to transcribe the chunk
+                response = openai.Audio.transcribe("whisper-1", chunk_file)
+
+                # Append the transcript for this chunk to the overall transcript
+                
+
+        return response.text
+    except Exception as e:
+        print(e)
+        return ""
+
 
 
 # Create your views here.
@@ -99,9 +134,21 @@ class ListVideoTranscriptView(APIView):
             video = Video.objects.get(id=pk)
             
             file_path = video.video_file_path  # Replace with your actual attribute
-
+            if  video.transcript_data is None:
+                transcript =  transcribe_audio(video.audio_path)
+                print(video.audio_path)
+                print("dmfmfmnfnffff")
+                if transcript:    
+                        print("dkfmjrffnnnfnfbfbf")
+                        video.transcript = transcript
+                        transcript_bytes = transcript.encode('utf-8')
+                        video.transcript_data = transcript_bytes
+                        video.completed = True
+                        video.save()
+                
             response = HttpResponse(video.transcript_data, content_type='text') 
             return response
+        
         
         videos = Video.objects.all().order_by('-created')
         serializer = VideoTrannscriptSerializer(videos,many=True,context={'request': request})
@@ -195,6 +242,7 @@ class VideoChunkView(APIView):
                     
                     
                     transcript = transcribe_audio(audio_temp_file_path)
+                    video.audio_path = audio_temp_file_path
                     if transcript:    
                             
                         video.transcript = transcript
@@ -231,39 +279,7 @@ class VideoChunkView(APIView):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-def transcribe_audio(audio_file_path, chunk_size=20000000):
-    try:
-        # Set your OpenAI API key
-        api_key = "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"
 
-        # Initialize the OpenAI API client
-        openai.api_key = api_key
-
-        # Initialize an empty transcript
-        transcript = ""
-
-        # Open the audio file in binary read mode
-        with open(audio_file_path, "rb") as audio_file:
-                # Read a 5MB chunk of the audio file
-                chunk = audio_file.read(chunk_size)
-                
-                # If the chunk is empty, we've reached the end of the file
-                if not chunk:
-                    return ""
-
-                # Wrap the chunk in a BytesIO object with a name attribute
-                chunk_file = BytesIO(chunk)
-                chunk_file.name = "audio_chunk.wav"
-
-                # Call the Whisper ASR API to transcribe the chunk
-                response = openai.Audio.transcribe("whisper-1", chunk_file)
-
-                # Append the transcript for this chunk to the overall transcript
-                
-
-        return response.text
-    except Exception as e:
-        return ""
 
 
 
