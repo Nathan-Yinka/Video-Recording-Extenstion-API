@@ -11,11 +11,11 @@ urlpatterns = [
     path("transcript/",views.ListVideoTranscriptView.as_view(),name="video-transcripts"),
     
     
-    path("chunks/<int:pk>",views.VideoChunkView.as_view(),name='send-chunk'),
+    path("chunks/<int:pk>/",views.VideoChunkView.as_view(),name='send-chunk'),
     
-    path("combine/<int:pk>",views.VideoCombineView.as_view()),
+    path("combine/<int:pk>/",views.VideoCombineView.as_view()),
     path('concatenate/<int:video_id>/', views.ConcatenateVideoView.as_view(), name='concatenate_video'),
     
     # test script for the blob data
-    path("home",views.home,name="test-script"),
+    path("home/",views.home,name="test-script"),
 ]
