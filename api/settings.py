@@ -13,6 +13,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 import dj_database_url
+from dotenv import load_dotenv
+import dj_database_url
+
+load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -49,6 +54,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -81,20 +87,20 @@ WSGI_APPLICATION = 'api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+database_url = os.environ.get("DATABASE_URL")
+db_from_env = dj_database_url.config(default=database_url)
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': db_from_env
 }
 
-# database_url = os.environ.get("DATABASE_URL")
-# db_from_env = dj_database_url.config(default="postgres://hng_api_user:99WwShBMhWEbGNqRAfZuyzUjtblUOXgH@dpg-ck0aom36fquc739kvk80-a.oregon-postgres.render.com/hng_api")
-
-
-# DATABASES = {
-#     'default': db_from_env
-# }
 
 
 # Password validation
@@ -145,5 +151,25 @@ MEDIA_URL = '/media/'
 
 
 TEMP_DIR = os.path.join(MEDIA_ROOT, 'temp')
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+
+
+
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR/ "staticfiles"
+STATICFILES_DIRS= [
+    
+]
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
