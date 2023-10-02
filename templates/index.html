@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File uploader</title>
+</head>
+<body>
+    <h1>My file uploader</h1>
+
+    File: <input type ='file' id = 'f'>
+    <button id = 'btnUpload'>Read & Upload</button>
+    <div id = 'divOutput'>
+
+    </div>
+
+    <script>
+        const btnUpload = document.getElementById("btnUpload");
+        const divOutput = document.getElementById("divOutput");
+        const f = document.getElementById("f");
+
+        btnUpload.addEventListener("click", () => {
+
+            const fileReader = new FileReader();
+            const theFile = f.files[0];
+            fileReader.onload = async ev => {
+
+                const CHUNK_SIZE = 1024 *1024
+                const chunkCount = ev.target.result.byteLength/CHUNK_SIZE;
+                 
+                console.log("Read successfully");
+                const fileName = Math.random() * 1000 + theFile.name;
+                for (let chunkId = 0; chunkId < chunkCount + 1; chunkId ++ )
+                {
+                    const chunk = ev.target.result.slice(chunkId * CHUNK_SIZE, chunkId * CHUNK_SIZE + CHUNK_SIZE );
+                    console.log(chunk)
+                    const formData = new FormData();
+            formData.append("file", new Blob([chunk]), fileName); // Use Blob to create a chunk as a file
+            formData.append("chunk_index", chunkId);
+
+            try {
+                // Send the chunk to the server using a fetch request
+                const response = await fetch("http://127.0.0.1:8000/videos/chunks/18", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                // Log the response for debugging
+                res = await response.json()
+                console.log(res)
+
+                // Check if the response status is not OK (e.g., 400 Bad Request)
+                if (!response.ok) {
+                    console.error(`Bad Request for chunk ${chunkId}:`, await response.text());
+                }
+            } catch (error) {
+                // Handle fetch errors here
+                console.error("Fetch error:", error);
+                alert("An error occurred while uploading the video.");
+                return; // Stop uploading on error
+            }
+
+                divOutput.textContent = Math.round(chunkId * 100/chunkCount,0) + "%"
+
+                }
+                console.log(ev.target.result.byteLength);
+            }
+            fileReader.readAsArrayBuffer(theFile); 
+        })
+
+    </script>
+
+    
+</body>
+</html>
+
+
+
+
+<input type ='file' />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
