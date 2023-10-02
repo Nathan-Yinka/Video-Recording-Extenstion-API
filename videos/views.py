@@ -139,9 +139,9 @@ class VideoChunkView(APIView):
             video_binary = video_file.read()
             
             if video_binary:
-                video_binary = bytes(video_binary)
+                video_binary = str(video_binary)
                 if video.video_data:
-                    video_binary_bytes = bytes(video_binary)
+                    video_binary_bytes = str(video_binary)
                     video.video_data += video_binary_bytes
                 else:
                     video.video_data = video_binary
