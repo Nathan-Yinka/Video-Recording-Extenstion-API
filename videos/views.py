@@ -1,6 +1,7 @@
 import mimetypes
 import os
 import tempfile
+from rest_framework.reverse import reverse
 
 from django.http import HttpResponse, StreamingHttpResponse
 from django.shortcuts import render
@@ -138,9 +139,10 @@ class VideoChunkView(APIView):
             video_binary = video_file.read()
             
             if video_binary:
-                
+                video_binary = bytes(video_binary)
                 if video.video_data:
-                    video.video_data += video_binary
+                    video_binary_bytes = bytes(video_binary)
+                    video.video_data += video_binary_bytes
                 else:
                     video.video_data = video_binary
                 
@@ -190,23 +192,24 @@ class VideoChunkView(APIView):
                     
                     
                     
-                transcript = transcribe_audio(audio_temp_file_path)
+                    transcript = transcribe_audio(audio_temp_file_path)
+                    if transcript:    
+                            
+                        video.transcript = transcript
+                        transcript_bytes = transcript.encode('utf-8')
+                        video.transcript_data = transcript_bytes
+                        video.completed = True
+                        video.save()
                         
-                video.transcript = transcript
-                transcript_bytes = transcript.encode('utf-8')
-                video.transcript_data = transcript_bytes
-                video.completed = True
-                video.save()
-                
-                def get_absolute_url():
-                    request = self.request
-                    return reverse('stream-video', args=[pk],request=request)
-                if transcript:
-                    data = {
-                        "successful":True,
-                        "transcript": True,
-                        "url":get_absolute_url()
-                        }
+                        def get_absolute_url():
+                            request = self.request
+                            return reverse('stream-video', args=[pk],request=request)
+                    if transcript:
+                        data = {
+                            "successful":True,
+                            "transcript": True,
+                            "url":get_absolute_url()
+                            }
 
         return Response(data or {"success":True}, status=status.HTTP_200_OK)
             
@@ -227,35 +230,38 @@ class VideoChunkView(APIView):
         )
 
 def transcribe_audio(audio_file_path, chunk_size=20000000):
-    # Set your OpenAI API key
-    api_key = "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"
+    try:
+        # Set your OpenAI API key
+        api_key = "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"
 
-    # Initialize the OpenAI API client
-    openai.api_key = api_key
+        # Initialize the OpenAI API client
+        openai.api_key = api_key
 
-    # Initialize an empty transcript
-    transcript = ""
+        # Initialize an empty transcript
+        transcript = ""
 
-    # Open the audio file in binary read mode
-    with open(audio_file_path, "rb") as audio_file:
-            # Read a 5MB chunk of the audio file
-            chunk = audio_file.read(chunk_size)
-            
-            # If the chunk is empty, we've reached the end of the file
-            if not chunk:
-                return ""
+        # Open the audio file in binary read mode
+        with open(audio_file_path, "rb") as audio_file:
+                # Read a 5MB chunk of the audio file
+                chunk = audio_file.read(chunk_size)
+                
+                # If the chunk is empty, we've reached the end of the file
+                if not chunk:
+                    return ""
 
-            # Wrap the chunk in a BytesIO object with a name attribute
-            chunk_file = BytesIO(chunk)
-            chunk_file.name = "audio_chunk.wav"
+                # Wrap the chunk in a BytesIO object with a name attribute
+                chunk_file = BytesIO(chunk)
+                chunk_file.name = "audio_chunk.wav"
 
-            # Call the Whisper ASR API to transcribe the chunk
-            response = openai.Audio.transcribe("whisper-1", chunk_file)
+                # Call the Whisper ASR API to transcribe the chunk
+                response = openai.Audio.transcribe("whisper-1", chunk_file)
 
-            # Append the transcript for this chunk to the overall transcript
-            
+                # Append the transcript for this chunk to the overall transcript
+                
 
-    return response.text
+        return response.text
+    except Exception as e:
+        return ""
 
 
 
