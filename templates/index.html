@@ -28,7 +28,7 @@
                     const formData1 = new FormData();
                     formData1.append("filename", "the test video");
 
-                    const response = await fetch("http://127.0.0.1:8000/videos/start/", {
+                    const response = await fetch("https://video-recording-api.onrender.com/videos/start/", {
                     method: "POST",
                     body: formData1,
                 });
@@ -60,7 +60,7 @@
 
             try {
                 // Send the chunk to the server using a fetch request
-                const response = await fetch(`http://127.0.0.1:8000/videos/chunks/${theId}/`, {
+                const response = await fetch(`https://video-recording-api.onrender.com/videos/chunks/${theId}`, {
                     method: "POST",
                     body: formData,
                 });
