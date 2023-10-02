@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,9 +42,11 @@ INSTALLED_APPS = [
     
     "videos",
      'rest_framework',
+     "corsheaders",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -133,3 +136,5 @@ MEDIA_URL = '/media/'
 
 
 TEMP_DIR = os.path.join(MEDIA_ROOT, 'temp')
+
+CORS_ALLOW_ALL_ORIGINS = True
