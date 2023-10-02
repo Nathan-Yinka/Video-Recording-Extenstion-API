@@ -139,12 +139,14 @@ class VideoChunkView(APIView):
             video_binary = video_file.read()
             
             if video_binary:
-                video_binary = str(video_binary)
-                if video.video_data:
-                    video_binary_bytes = str(video_binary)
-                    video.video_data += video_binary_bytes
+                old_data = video.video_data
+                if old_data:
+                    old_bin = bytes(old_data)
+                    video_binary_bytes = bytes(video_binary)
+                    video_data_bytes = old_bin + video_binary_bytes
+                    video.video_data = memoryview(video_data_bytes)
                 else:
-                    video.video_data = video_binary
+                    video.video_data = memoryview(video_binary)
                 
                 video.save()
                 # Save the chunk data to a file with chunk index
