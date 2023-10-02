@@ -15,7 +15,7 @@ imageio
 imageio-ffmpeg
 moviepy
 multidict
-numpy=
+numpy
 openai
 Pillow
 proglog
