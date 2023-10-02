@@ -173,3 +173,30 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+
+CORS_ALLOWS_ORIGINS = [
+    "http://localhost:5500",
+    "https://video-recording-api.onrender.com/videos/",
+    "https://helpmeoo.netlify.app/",
+    "https://malzahra.tech",
+    #"https://*",
+    #"http://*",
+]
+
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
+]
+
+CORS_ALLOW_HEADERS = [
+    "Accept",
+    "Content-Type",
+    "Authorization",
+]
+
+CORS_ALLOW_CREDENTIALS = True
